@@ -11,9 +11,9 @@ from pages.home import *
 navbar = dbc.NavbarSimple(
     children=[
         dbc.NavItem(dbc.NavLink("Home", href="/")),
-        dbc.NavItem(dbc.NavLink("Model 1", href="/model1")),
+        dbc.NavItem(dbc.NavLink("Model 1 - Car Price", href="/model1")),
     ],
-    brand="ML2023 Dash Example",
+    brand="ML2023 Dash - Anuj Gupta",
     brand_href="/",
     color="primary",
     dark=True,
