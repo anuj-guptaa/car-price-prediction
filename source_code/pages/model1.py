@@ -51,9 +51,9 @@ seller_type = html.Div(
           id="seller_type",
           inline=True,
           options=[
-            {'label': 'Dealer', 'value': "dealer"},
-            {'label': 'Individual', 'value': "individual"},
-            {'label': 'Trustmark', 'value': "trustmark"}
+            {'label': 'Dealer', 'value': "Dealer"},
+            {'label': 'Individual', 'value': "Individual"},
+            {'label': 'Trustmark', 'value': "Trustmark Dealer"}
           ],
         ),
     ],
@@ -141,17 +141,17 @@ seats = html.Div(
     className="mb-3",
 )
 
-submit_hardcode = html.Div([
-            dbc.Button(id="submit", children="calculate selling price using hardcode", color="primary", className="me-1"),
-            dbc.Label("y is: "),
+submit = html.Div([
+            dbc.Button(id="submit", children="calculate selling price using random forest regressor", color="primary", className="me-1"),
+            dbc.Label("y is:  "),
             html.Output(id="y", children="")
 ], style={'marginTop':'10px'})
 
-submit_model = html.Div([
-            dbc.Button(id="submit_model", children="calculate selling price using model", color="primary", className="me-1"),
-            dbc.Label("y is: "),
-            html.Output(id="y_model", children="")
-], style={'marginTop':'10px'})
+# submit_model = html.Div([
+#             dbc.Button(id="submit_model", children="calculate selling price using model", color="primary", className="me-1"),
+#             dbc.Label("y is: "),
+#             html.Output(id="y_model", children="")
+# ], style={'marginTop':'10px'})
 
 form =  dbc.Form([
             name,
@@ -164,8 +164,7 @@ form =  dbc.Form([
             engine,
             max_power,
             seats,
-            submit_hardcode,
-            submit_model
+            submit,
         ],
         className="mb-3")
 
@@ -202,25 +201,26 @@ layout =  dbc.Container([
 import pickle
 import sklearn
 import pandas
+import joblib
 
-with open('models/random_forest_regressor.pickle', 'rb') as f:
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import r2_score
+
+with open(r'/root/code/models/random_forest_regressor.pickle', 'rb') as f:
   model = pickle.load(f)
 
-columns = ['km_driven', 'fuel', 'transmission', 'owner', 'mileage',
-       'engine', 'max_power', 'seats', 'seller_type_Dealer',
-       'seller_type_Individual', 'seller_type_Trustmark Dealer', 'Audi',
-       'BMW', 'Chevrolet', 'Daewoo', 'Datsun', 'Fiat',
-       'Force', 'Ford', 'Honda', 'Hyundai', 'Isuzu',
-       'Jaguar', 'Jeep', 'Kia', 'Land', 'Lexus',
-       'MG', 'Mahindra', 'Maruti', 'Mercedes-Benz',
-       'Mitsubishi', 'Nissan', 'Opel', 'Peugeot',
-       'Renault', 'Skoda', 'Tata', 'Toyota',
-       'Volkswagen', 'Volvo']
+pipeline1 = joblib.load(r'/root/code/models/pipeline1.joblib')
 
-X_input = pd.DataFrame(columns=columns)
+columns = ['name', 'km_driven', 'fuel', 'seller_type', 'transmission', 'owner', 'mileage',
+       'engine', 'max_power', 'seats']
 
-name,km_driven,fuel,transmission,,mileage,engine,max_power,seats,'seller_type_Dealer', 'seller_type_Individual', 'seller_type_Trustmark Dealer'
-'Maruti', 145500, 'Diesel',1, 1, 23.4, 1248, 74, 5, 0, 1, 0
+# data = [['Maruti', 145500, 0, 'Individual', 1, 1, 23.4, 1248, 74, 5]]
 
 
 @callback(
@@ -228,12 +228,23 @@ name,km_driven,fuel,transmission,,mileage,engine,max_power,seats,'seller_type_De
     State(component_id="name", component_property="value"),
     State(component_id="km_driven", component_property="value"),
     State(component_id="fuel", component_property="value"),
+    State(component_id="seller_type", component_property="value"),
+    State(component_id="transmission", component_property="value"),
+    State(component_id="owner", component_property="value"),
+    State(component_id="mileage", component_property="value"),
+    State(component_id="engine", component_property="value"),
+    State(component_id="max_power", component_property="value"),
+    State(component_id="seats", component_property="value"),
     Input(component_id="submit", component_property='n_clicks'),
     prevent_initial_call=True
 )
-def calculate_y_hardcode(name, km_driven, fuel, submit):
-    
-    return name
+def calculate_y_hardcode(name, km_driven, fuel, seller_type, transmission, owner, mileage, engine, max_power, seats, submit):
+    data = [[name, km_driven, fuel, seller_type, transmission, owner, mileage, engine, max_power, seats]]
+    print(data)
+    X_input = pd.DataFrame(columns=columns, data=data)
+    X_input_transformed = pipeline1.transform(X_input)
+    selling_price = model.predict(X_input_transformed)
+    return selling_price
 
 # @callback(
 #     Output(component_id="y_model", component_property="children"),
