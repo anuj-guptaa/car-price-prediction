@@ -142,13 +142,13 @@ seats = html.Div(
 )
 
 submit_hardcode = html.Div([
-            dbc.Button(id="submit_hardcode", children="calculate y using hardcode", color="primary", className="me-1"),
+            dbc.Button(id="submit", children="calculate selling price using hardcode", color="primary", className="me-1"),
             dbc.Label("y is: "),
-            html.Output(id="y_hardcode", children="")
+            html.Output(id="y", children="")
 ], style={'marginTop':'10px'})
 
 submit_model = html.Div([
-            dbc.Button(id="submit_model", children="calculate y using model", color="primary", className="me-1"),
+            dbc.Button(id="submit_model", children="calculate selling price using model", color="primary", className="me-1"),
             dbc.Label("y is: "),
             html.Output(id="y_model", children="")
 ], style={'marginTop':'10px'})
@@ -198,15 +198,42 @@ layout =  dbc.Container([
         table
     ], fluid=True)
 
-# @callback(
-#     Output(component_id="y_hardcode", component_property="children"),
-#     State(component_id="x_1", component_property="value"),
-#     State(component_id="x_2", component_property="value"),
-#     Input(component_id="submit_hardcode", component_property='n_clicks'),
-#     prevent_initial_call=True
-# )
-# def calculate_y_hardcode(x_1, x_2, submit):
-#     return x_1 + x_2
+# Accessing user inputs and loading model
+import pickle
+import sklearn
+import pandas
+
+with open('models/random_forest_regressor.pickle', 'rb') as f:
+  model = pickle.load(f)
+
+columns = ['km_driven', 'fuel', 'transmission', 'owner', 'mileage',
+       'engine', 'max_power', 'seats', 'seller_type_Dealer',
+       'seller_type_Individual', 'seller_type_Trustmark Dealer', 'Audi',
+       'BMW', 'Chevrolet', 'Daewoo', 'Datsun', 'Fiat',
+       'Force', 'Ford', 'Honda', 'Hyundai', 'Isuzu',
+       'Jaguar', 'Jeep', 'Kia', 'Land', 'Lexus',
+       'MG', 'Mahindra', 'Maruti', 'Mercedes-Benz',
+       'Mitsubishi', 'Nissan', 'Opel', 'Peugeot',
+       'Renault', 'Skoda', 'Tata', 'Toyota',
+       'Volkswagen', 'Volvo']
+
+X_input = pd.DataFrame(columns=columns)
+
+name,km_driven,fuel,transmission,,mileage,engine,max_power,seats,'seller_type_Dealer', 'seller_type_Individual', 'seller_type_Trustmark Dealer'
+'Maruti', 145500, 'Diesel',1, 1, 23.4, 1248, 74, 5, 0, 1, 0
+
+
+@callback(
+    Output(component_id="y", component_property="children"),
+    State(component_id="name", component_property="value"),
+    State(component_id="km_driven", component_property="value"),
+    State(component_id="fuel", component_property="value"),
+    Input(component_id="submit", component_property='n_clicks'),
+    prevent_initial_call=True
+)
+def calculate_y_hardcode(name, km_driven, fuel, submit):
+    
+    return name
 
 # @callback(
 #     Output(component_id="y_model", component_property="children"),
