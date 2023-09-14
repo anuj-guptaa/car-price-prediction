@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 dash.register_page(__name__, path='/')
 
 layout =  dbc.Container([
-    html.H1("Welcome the teacher of ML2023."),
-    html.H1("I hope you are enjoying teaching!!!"),
+    html.H1("Welcome to an assortment of ML/DL projects by Anuj Gupta."),
+    html.H1("I hope you enjoy testing out my models!"),
 
 ], fluid=True)
