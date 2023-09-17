@@ -5,6 +5,7 @@ services:
     build: 
       context: .
       dockerfile: .Dockerfile
+    working_dir: /root/code
     volumes:
       - ./source_code:/root/code
       - ./.vscode-server:/root/.vscode-server
